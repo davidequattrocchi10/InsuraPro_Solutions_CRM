@@ -1,11 +1,18 @@
 #include <bits/stdc++.h>
 using namespace std;
 #include <limits.h>
-#include <unistd.h>
 
 // Function to fix the format of the name and lastname
 string fix_format(string name)
 {
+    if (name.empty())
+    {
+        throw invalid_argument("Name isn't valid: The name mustn't be empty.");
+    }
+    // Remove the spaces at the beginning of the string
+    name.erase(0, name.find_first_not_of(" \t\n"));
+    // Remove the spaces at the end of the string
+    name.erase(name.find_last_not_of(" \t\n") + 1);
     // Convert the first letter to uppercase
     name[0] = toupper(name[0]);
     // Convert the other letters to lowercase
@@ -93,52 +100,38 @@ public:
     // Constructor with parameters
     Customer(string _name, string _lastname, string _date, string _email, string _phone)
     {
-        if (check_name_lastname(_name))
+        if (!check_name_lastname(_name))
         {
-            name = _name;
+            throw invalid_argument("Name isn't valid: The name must include only letters.");
+        }
+        name = _name;
+
+        if (!check_name_lastname(_lastname))
+        {
+            throw invalid_argument("Lastname isn't valid: The lastname must include only letters.");
+        }
+        lastname = _lastname;
+        if (!check_date(_date))
+        {
+            throw invalid_argument("Date isn't valid: The date must be in the format GG/MM/AAAA.");
         }
         else
-        {
-            cout << "Please enter a valid name." << endl;
-        }
-        if (check_name_lastname(_lastname))
-        {
-            lastname = _lastname;
-        }
-        else
-        {
-            cout << "Please enter a valid lastname." << endl;
-        }
-        if (check_date(_date))
-        {
             date = _date;
-        }
-        else
+        if (!verify_email(_email))
         {
-            cout << "Please enter a valid date." << endl;
+            throw invalid_argument("Email isn't valid: The email must include @ and .");
         }
-        if (verify_email(_email))
+        email = _email;
+        if (!only_ten_numbers(_phone))
         {
-            email = _email;
-        }
-        else
-        {
-            cout << "Please enter a valid email." << endl;
-        }
-        if (only_ten_numbers(_phone))
-        {
-            phone = _phone;
-        }
-        else
-        {
-            cout << "Please enter a valid phone number." << endl;
+            throw invalid_argument("Phone number isn't valid: The phone number must include only (ten) numbers.");
         }
         phone = _phone;
     }
     // prints the information of the customer
     void info_customer()
     {
-        cout << "\nThe information of the customer is: " << endl;
+        cout << "The customer information is: " << endl;
         cout << "Name: " << name << endl;
         cout << "Lastname: " << lastname << endl;
         cout << "Date of Birth: " << date << endl;
@@ -181,60 +174,45 @@ public:
     // Setters
     void set_name(string _name)
     {
-        if (check_name_lastname(_name))
+        if (!check_name_lastname(_name))
         {
-            name = _name;
+            throw invalid_argument("Name isn't valid: The name must include only letters.");
         }
-        else
-        {
-            cout << "Please enter a valid name." << endl;
-        }
+        name = _name;
     }
 
     void set_lastname(string _lastname)
     {
-        if (check_name_lastname(_lastname))
+        if (!check_name_lastname(_lastname))
         {
-            lastname = _lastname;
+            throw invalid_argument("Lastname isn't valid: The lastname must include only letters.");
         }
-        else
-        {
-            cout << "Please enter a valid lastname." << endl;
-        }
+        lastname = _lastname;
     }
 
     void set_date(string _date)
     {
-        if (check_date(_date))
+        if (!check_date(_date))
         {
-            date = _date;
+            throw invalid_argument("Date isn't valid: The date must be in the format GG/MM/AAAA.");
         }
-        else
-        {
-            cout << "Please enter a valid date." << endl;
-        }
+        date = _date;
     }
     void set_email(string _email)
     {
-        if (verify_email(_email))
+        if (!verify_email(_email))
         {
-            email = _email;
+            throw invalid_argument("Email isn't valid: The email must include @ and .");
         }
-        else
-        {
-            cout << "Please enter a valid email." << endl;
-        }
+        email = _email;
     }
     void set_phone(string _phone)
     {
-        if (only_ten_numbers(_phone))
+        if (!only_ten_numbers(_phone))
         {
-            phone = _phone;
+            throw invalid_argument("Phone number isn't valid: The phone number must include only (ten) numbers.");
         }
-        else
-        {
-            cout << "Please enter a valid phone number." << endl;
-        }
+        phone = _phone;
     }
 };
 
@@ -251,24 +229,21 @@ public:
     Interaction(string _type_of_appointment, string _date, bool _outcome, Customer *_ptr_customer)
     {
         type_of_appointment = _type_of_appointment;
-        if (check_date(_date))
+        if (!check_date(_date))
         {
-            date = _date;
+            throw invalid_argument("Date isn't valid: The date must be in the format GG/MM/AAAA.");
         }
-        else
-        {
-            cout << "Please enter a valid date." << endl;
-        }
+        date = _date;
         outcome = _outcome;
         ptr_customer = _ptr_customer;
     }
     // Prints the interaction of the customer
     void info_interaction()
     {
-        cout << "\nThe information of the interaction for customer " << ptr_customer->get_name() << " " << ptr_customer->get_lastname() << " is: " << endl;
+        // cout << "The information of the interaction for customer " << ptr_customer->get_name() << " " << ptr_customer->get_lastname() << " is: " << endl;
         cout << "Type of Appointment: " << type_of_appointment << endl;
         cout << "Date: " << date << endl;
-        cout << "Outcome: " << outcome << endl
+        cout << "Outcome: " << (outcome ? "good" : "not_good") << endl
              << endl;
     }
     // Check if the customer that have a interaction is equal to the customer provided in input
@@ -310,14 +285,11 @@ public:
     }
     void set_date(string _date)
     {
-        if (check_date(_date))
+        if (!check_date(_date))
         {
-            date = _date;
+            throw invalid_argument("Date isn't valid: The date must be in the format GG/MM/AAAA.");
         }
-        else
-        {
-            cout << "Please enter a valid date." << endl;
-        }
+        date = _date;
     }
     void set_outcome(bool _outcome)
     {
@@ -355,6 +327,13 @@ public:
     // Removes a customer from the list
     void remove_customer(Customer *customer)
     {
+        // Remove the interactions of the customer from the list. remove_if() method is incluse in std::list
+        customer_interactions.remove_if(
+            [customer](Interaction &interaction)
+            {
+                return interaction.find_interaction(*customer);
+            });
+
         // Remove the customer from the list. remove() method is incluse in std::list
         customer_management.remove(*customer);
     }
@@ -366,13 +345,21 @@ public:
     // Prints the information of all the customers
     void info_all_customers()
     {
+        int flag = 0;
         for (auto iterator = customer_management.begin(); iterator != customer_management.end(); ++iterator)
         {
+            flag++;
+            cout << "\n"
+                 << flag << ")" << endl;
             iterator->info_customer();
+        }
+        if (flag == 0)
+        {
+            cout << "\nThere aren't customers in the list!" << endl;
         }
     }
     // Prints the information of all the interactions for a customer
-    void info_all_interactions(Customer customer)
+    void info_all_interactions(const Customer &customer)
     {
         // keyword "auto" --> to avoid the type of the iterator
         int flag = 0;
@@ -381,13 +368,18 @@ public:
             if (iterator->find_interaction(customer))
             {
                 flag++;
-                cout << flag << ") interaction:" << endl;
+                if (flag == 1)
+                {
+                    cout << "The information of the interaction for customer " << iterator->get_customer()->get_name() << " " << iterator->get_customer()->get_lastname() << " is: " << endl;
+                }
+                cout << "\n"
+                     << flag << ") interaction:" << endl;
                 iterator->info_interaction();
             }
         }
         if (flag == 0)
         {
-            cout << "The customer does not have any interaction." << endl;
+            cout << "\nThe customer does not have any interaction." << endl;
         }
     }
     // Check if a customer exists in the list
@@ -422,7 +414,7 @@ public:
 int option_function()
 {
     void clean_buffer();
-    cout << "Please select an option: " << endl;
+    cout << "\nPlease select an option: " << endl;
     cout << "1. Add a new customer" << endl;
     cout << "2. Add a new interaction for a specific customer" << endl;
     cout << "3. View all customers" << endl;
@@ -430,8 +422,6 @@ int option_function()
     cout << "5. Modify a customer" << endl;
     cout << "6. Delete a customer" << endl;
     cout << "7. Save and Exit" << endl;
-    // Pulisci il buffer
-    clean_buffer();
     int option;
     cin >> option;
     return option;
@@ -440,8 +430,10 @@ int option_function()
 // Function to clean the buffer
 void clean_buffer()
 {
-    while (getchar() != '\n' && getchar() != EOF)
-        ;
+    // Reset the error flags of the stream
+    cin.clear();
+    // Ignore the residual characters in the buffer
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 // Function to insert the name of the customer
 string insert_name_customer()
@@ -512,8 +504,7 @@ string insert_date_interaction()
 bool insert_outcome_interaction()
 {
     string outcome;
-    cout << "Please enter the outcome of the appointment: [good/not good]" << endl;
-    clean_buffer();
+    cout << "Please enter the outcome of the appointment: [good/not_good]" << endl;
     cin >> outcome;
     return outcome == "good" ? true : false;
 }
@@ -522,24 +513,6 @@ int main()
 {
     cout << "\n\nWelcome to InsuraPro Solutions. We are dedicated to providing the highest quality customer management for insurance companies." << endl;
     Customer_Management cm;
-    // current path
-    char cwd[PATH_MAX];
-    // full path where save the file
-    string full_path;
-    // file name
-    string file_name = "file.txt";
-    if (strcmp(cwd, "C:\\Users\\Utente\\Profession AI\\Project_C++") != 0)
-    {
-        // Change the directory
-        chdir("C:\\Users\\Utente\\Profession AI\\Project_C++");
-    }
-    if (getcwd(cwd, sizeof(cwd)) == NULL)
-    {
-        perror("Errore");
-        return 0;
-    }
-    // Create the full path
-    full_path = string(cwd) + "\\" + file_name;
     cout << "\nHave you already a CRM? [y/n]" << endl;
     string response;
     cin >> response;
@@ -547,43 +520,66 @@ int main()
     {
         // Upload the file
         cout << "Great! Let's start by upload the file" << endl;
-        FILE *file;
-        // Open the file in read mode and c_str() --> convert the string to a c-string (char array in C)
-        file = fopen(full_path.c_str(), "r");
-        if (file == NULL)
+        // path without the file name
+        char cwd[PATH_MAX];
+        // full path where save the file
+        string full_path;
+        // file name
+        string file_name = "file.txt";
+        int index_while = 0;
+        do
         {
-            cout << "Error in opening the file." << endl;
-            exit(1);
-        }
-        char line[200];
-        string name, lastname, date, email, phone, type_of_appointment, date_appointment, outcome;
-        int number_interactions;
-        // Read and insert in the lists  the information of the customers and interactions
-        while (fgets(line, sizeof(line), file) != NULL)
-        {
-            // Ignore the spaces at the beginning of the line
-            int i = 0;
-            while (line[i] == ' ')
-                i++;
-            if (!isdigit(line[i]))
+            clean_buffer();
+            cout << "Enter the path where you want to read the file: " << endl;
+            // In my directory -> C:\\Users\\Utente\\Profession_AI\\Project_C++
+            cin >> cwd;
+            // Create the full path
+            full_path = string(cwd) + "\\" + file_name;
+            cout << "The full path is: " << full_path << endl;
+            FILE *file;
+            // Open the file in read mode and c_str() --> convert the string to a c-string (char array in C)
+            file = fopen(full_path.c_str(), "r");
+            if (file == NULL)
             {
-                // Read the information of the customer
-                istringstream iss(line);
-                iss >> name >> lastname >> date >> email >> phone;
-                Customer custom1(name, lastname, date, email, phone);
-                cm.add_customer(custom1);
+                cout << "The file does not exist. Please enter a valid path." << endl;
+                index_while = 1;
             }
             else
             {
-                // Read the information of the interaction
-                istringstream iss(line);
-                iss >> number_interactions >> name >> lastname >> type_of_appointment >> date_appointment >> outcome;
-                Customer *ptr_customer = cm.recover_customer(name, lastname);
-                Interaction inter1(type_of_appointment, date_appointment, outcome == "good" ? true : false, ptr_customer);
-                cm.add_interaction(inter1);
+                index_while = 0;
+                char line[200];
+                string name, lastname, date, email, phone, type_of_appointment, date_appointment, outcome;
+                int number_interactions;
+                // Read and insert in the lists  the information of the customers and interactions
+                while (fgets(line, sizeof(line), file) != NULL)
+                {
+                    // Ignore the spaces at the beginning of the line
+                    int i = 0;
+                    while (line[i] == ' ' || line[i] == '\t')
+                        i++;
+                    if (!isdigit(line[i]))
+                    {
+                        // Read the information of the customer
+                        istringstream iss(line);
+                        iss >> name >> lastname >> date >> email >> phone;
+                        Customer custom1(name, lastname, date, email, phone);
+                        cm.add_customer(custom1);
+                    }
+                    else
+                    {
+                        // Read the information of the interaction
+                        istringstream iss(line);
+                        iss >> number_interactions >> name >> lastname >> type_of_appointment >> date_appointment >> outcome;
+                        Customer *ptr_customer = cm.recover_customer(name, lastname);
+                        Interaction inter1(type_of_appointment, date_appointment, outcome == "good" ? true : false, ptr_customer);
+                        cm.add_interaction(inter1);
+                    }
+                }
+                cout << "The file has been uploaded." << endl;
+                fclose(file);
             }
-        }
-        cout << "The file has been uploaded." << endl;
+
+        } while (index_while == 1);
     }
     cout << "\nLet's start!" << endl;
     int option;
@@ -595,7 +591,7 @@ int main()
         case 1:
         {
             // Add new customer to the list
-            cout << "Please enter the information of the customer: " << endl;
+            cout << "Please enter the customer information you want to add to the list: " << endl;
             string name = insert_name_customer();
             string lastname = insert_lastname_customer();
             string date = insert_date_customer();
@@ -605,22 +601,25 @@ int main()
             {
                 Customer custom1(name, lastname, date, email, phone);
                 cm.add_customer(custom1);
-                cout << "\nThe customer has been added to the list." << endl;
+                cout << "\nThe customer has been added to the list." << endl
+                     << endl;
             }
             catch (const invalid_argument &e)
             {
-                cout << e.what() << endl;
+                cout << "\n"
+                     << e.what() << endl;
             }
             break;
         }
         case 2:
         {
             // Add new interaction to the list
+            cout << "Please enter the information of the customer you want to add an interaction: " << endl;
             string name = insert_name_customer();
             string lastname = insert_lastname_customer();
             if (cm.exist_customer(name, lastname))
             {
-                cout << "Please enter the information of the interaction: " << endl;
+                cout << "Please enter the information of the interaction for this customer: " << endl;
                 string type_of_appointment = insert_type_of_appointment();
                 string date = insert_date_interaction();
                 bool outcome = insert_outcome_interaction();
@@ -629,7 +628,8 @@ int main()
                 {
                     Interaction inter1(type_of_appointment, date, outcome, ptr_customer);
                     cm.add_interaction(inter1);
-                    cout << "\nThe interaction has been added to the list." << endl;
+                    cout << "\nThe interaction has been added to the list." << endl
+                         << endl;
                 }
                 catch (const invalid_argument &e)
                 {
@@ -638,7 +638,8 @@ int main()
             }
             else
             {
-                cout << "The customer does not exist in the list." << endl;
+                cout << "\nThe customer does not exist in the list." << endl
+                     << endl;
             };
 
             break;
@@ -652,6 +653,7 @@ int main()
         case 4:
         {
             // Print the information of all the interactions of a customer
+            cout << "Please enter the information of the customer you want to see the interactions:" << endl;
             string name = insert_name_customer();
             string lastname = insert_lastname_customer();
             if (cm.exist_customer(name, lastname))
@@ -661,7 +663,8 @@ int main()
             }
             else
             {
-                cout << "The customer does not exist." << endl;
+                cout << "\nThe customer does not exist." << endl
+                     << endl;
             };
 
             break;
@@ -669,6 +672,7 @@ int main()
         case 5:
         {
             // Modify the information of a customer
+            cout << "Please enter the customer information you want to modify: " << endl;
             string name = insert_name_customer();
             string lastname = insert_lastname_customer();
             if (cm.exist_customer(name, lastname))
@@ -683,36 +687,42 @@ int main()
                     {
                         string new_name = insert_name_customer();
                         ptr_customer->set_name(new_name);
-                        cout << "\nThe name has been modified with " << new_name << endl;
+                        cout << "\nThe name has been modified with " << new_name << endl
+                             << endl;
                     }
                     else if (response == "lastname")
                     {
                         string new_lastname = insert_lastname_customer();
                         ptr_customer->set_lastname(new_lastname);
-                        cout << "\nThe lastname has been modified with " << new_lastname << endl;
+                        cout << "\nThe lastname has been modified with " << new_lastname << endl
+                             << endl;
                     }
                     else if (response == "date")
                     {
                         string new_date = insert_date_customer();
                         ptr_customer->set_date(new_date);
-                        cout << "\nThe date of birth has been modified with " << new_date << endl;
+                        cout << "\nThe date of birth has been modified with " << new_date << endl
+                             << endl;
                     }
                     else if (response == "email")
                     {
                         string new_email = insert_email_customer();
                         ptr_customer->set_email(new_email);
-                        cout << "\nThe email has been modified with " << new_email << endl;
+                        cout << "\nThe email has been modified with " << new_email << endl
+                             << endl;
                     }
                     else if (response == "phone")
                     {
                         string new_phone = insert_phone_customer();
                         ptr_customer->set_phone(new_phone);
-                        cout << "\nThe phone has been modified with " << new_phone << endl;
+                        cout << "\nThe phone has been modified with " << new_phone << endl
+                             << endl;
                     }
 
                     else
                     {
-                        cout << "Please enter a valid option." << endl;
+                        cout << "Please enter a valid option." << endl
+                             << endl;
                     }
                 }
                 catch (const invalid_argument &e)
@@ -722,23 +732,28 @@ int main()
             }
             else
             {
-                cout << "The customer does not exist." << endl;
+                cout << "\nThe customer does not exist." << endl
+                     << endl;
             }
             break;
         }
         case 6:
         {
             // Delete a customer from the list
+            cout << "Please enter the customer information you want to delete:" << endl;
             string name = insert_name_customer();
             string lastname = insert_lastname_customer();
             if (cm.exist_customer(name, lastname))
             {
                 Customer *ptr_customer = cm.recover_customer(name, lastname);
                 cm.remove_customer(ptr_customer);
+                cout << "\nThe customer and his interactions has been removed to the lists." << endl
+                     << endl;
             }
             else
             {
-                cout << "The customer does not exist." << endl;
+                cout << "\nThe customer does not exist." << endl
+                     << endl;
             }
             break;
         }
@@ -747,33 +762,53 @@ int main()
             // Save the file and exit
             cout << "Saving the file..." << endl;
             clean_buffer();
-            FILE *file;
-            // Open the file in write mode
-            file = fopen(full_path.c_str(), "w");
-            if (file == NULL)
+            // path without the file name
+            char cwd[PATH_MAX];
+            // full path where save the file
+            string full_path;
+            // file name
+            string file_name = "file.txt";
+            int index_while = 0;
+            do
             {
-                cout << "Error in creating the file." << endl;
-                exit(1);
-            }
-            // Loop over the list of customers
-            for (auto iterator = cm.customer_management.begin(); iterator != cm.customer_management.end(); ++iterator)
-            {
-                fprintf(file, "%s %s %s %s %s\n", iterator->get_name().c_str(), iterator->get_lastname().c_str(), iterator->get_date().c_str(), iterator->get_email().c_str(), iterator->get_phone().c_str());
-                // Loop over the list of interactions
-                int number_interactions = 1;
-                for (auto iterator2 = cm.customer_interactions.begin(); iterator2 != cm.customer_interactions.end(); ++iterator2)
+                cout << "Enter the path where you want to save the file: " << endl;
+                // In my directory -> C:\\Users\\Utente\\Profession_AI\\Project_C++
+                cin >> cwd;
+                // Create the full path
+                full_path = string(cwd) + "\\" + file_name;
+                cout << "The full path is: " << full_path << endl;
+                FILE *file;
+                // Open the file in write mode
+                file = fopen(full_path.c_str(), "w");
+                if (file == NULL)
                 {
-                    if (iterator2->get_customer()->get_name() == iterator->get_name() && iterator2->get_customer()->get_lastname() == iterator->get_lastname())
-                    {
-                        bool outcome = iterator2->get_outcome();
-                        string outcome_str = outcome ? "good" : "not_good";
-                        fprintf(file, "%d %s %s %s %s %s\n", number_interactions, iterator2->get_customer()->get_name().c_str(), iterator2->get_customer()->get_lastname().c_str(), iterator2->get_type_of_appointment().c_str(), iterator2->get_date().c_str(), outcome_str.c_str());
-                        number_interactions++;
-                    }
+                    cout << "Error. Please enter a valid path." << endl;
+                    index_while = 1;
                 }
-            }
-            cout << "Thank you for using InsuraPro Solutions. Have a great day!" << endl;
-            fclose(file);
+                else
+                {
+                    index_while = 0;
+                    // Loop over the list of customers
+                    for (auto iterator = cm.customer_management.begin(); iterator != cm.customer_management.end(); ++iterator)
+                    {
+                        fprintf(file, "%s %s %s %s %s\n", iterator->get_name().c_str(), iterator->get_lastname().c_str(), iterator->get_date().c_str(), iterator->get_email().c_str(), iterator->get_phone().c_str());
+                        // Loop over the list of interactions
+                        int number_interactions = 1;
+                        for (auto iterator2 = cm.customer_interactions.begin(); iterator2 != cm.customer_interactions.end(); ++iterator2)
+                        {
+                            if (iterator2->get_customer()->get_name() == iterator->get_name() && iterator2->get_customer()->get_lastname() == iterator->get_lastname())
+                            {
+                                bool outcome = iterator2->get_outcome();
+                                string outcome_str = outcome ? "good" : "not_good";
+                                fprintf(file, "\t%d %s %s %s %s %s\n", number_interactions, iterator2->get_customer()->get_name().c_str(), iterator2->get_customer()->get_lastname().c_str(), iterator2->get_type_of_appointment().c_str(), iterator2->get_date().c_str(), outcome_str.c_str());
+                                number_interactions++;
+                            }
+                        }
+                    }
+                    cout << "Thank you for using InsuraPro Solutions. Have a great day!" << endl;
+                    fclose(file);
+                }
+            } while (index_while == 1);
             break;
         }
         default:
